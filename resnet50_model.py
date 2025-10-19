@@ -1,3 +1,14 @@
+"""
+ResNet50 모델 정의 및 유틸 함수
+- ImageNet 정규화 내장 (입력 [0,1] → 내부에서 정규화)
+- 사전학습(backbone) 및 학습된 가중치 체크포인트 로드 지원
+
+주요 함수/클래스:
+  - ResNet50WithNorm: 내부적으로 ImageNet 정규화 포함한 ResNet50 (torchvision)
+  - load_trained_model: 학습된 모델 가중치(pth) 불러오기
+  - get_model_info: 체크포인트에서 클래스명 등 부가 정보 추출
+"""
+
 import torch
 import torch.nn as nn
 from torchvision import models
