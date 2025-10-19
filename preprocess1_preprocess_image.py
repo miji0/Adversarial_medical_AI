@@ -57,7 +57,7 @@ try:
     drive.mount('/content/drive')
     
     # Colab에서만 경로 이동
-    os.chdir('/content/drive/MyDrive/Adversarial_medical_AI/Adversarial_medical_AI')
+    os.chdir('/content/drive/MyDrive/Adversarial_medical_AI')
     print(f"[INFO] 작업 디렉토리 변경: {os.getcwd()}")
     
 except ImportError:
@@ -97,7 +97,7 @@ def _make_roi_mask(gray01):
 # ---------------------------
 # 3. 폴더 내 모든 이미지 로드 및 전처리
 # ---------------------------
-def split_and_preprocess_images(src_dir, img_size=(224,224)):
+def split_and_preprocess_images(src_dir, img_size=(224,224), shuffle=True, seed=42):
     images, labels, masks = [], [], []
     class_names = ["notumor", "tumor"]
     c2i = {c:i for i,c in enumerate(class_names)}
@@ -123,14 +123,25 @@ def split_and_preprocess_images(src_dir, img_size=(224,224)):
     X = np.stack(images) if images else np.empty((0,img_size[0],img_size[1],1),np.float32)
     y = np.array(labels, dtype=np.int64)
     M = np.stack(masks) if masks else np.empty((0,img_size[0],img_size[1]), np.bool_)
+    
+    # 🔀 데이터 셔플 (클래스 정렬 문제 해결)
+    if shuffle and len(X) > 0:
+        np.random.seed(seed)
+        indices = np.arange(len(X))
+        np.random.shuffle(indices)
+        X = X[indices]
+        y = y[indices]
+        M = M[indices]
+        print(f"[INFO] 데이터 셔플 완료 (seed={seed})")
+    
     return X, y, M, class_names     # (N,H,W,1) in [0,1], (N,) int64, (N,H,W) bool, [class_names]
 
 # ---------------------------
 # 4. 전처리 결과 저장 (npy 및 class/meta)
 # ---------------------------
-def save_split(src_dir, dst_dir, img_size=(224,224)):
+def save_split(src_dir, dst_dir, img_size=(224,224), shuffle=True, seed=42):
     os.makedirs(dst_dir, exist_ok=True)
-    X, y, M, names = split_and_preprocess_images(src_dir, img_size=img_size)
+    X, y, M, names = split_and_preprocess_images(src_dir, img_size=img_size, shuffle=shuffle, seed=seed)
 
     np.save(os.path.join(dst_dir, "images.npy"), X)   # (N,H,W,1) in [0,1]
     np.save(os.path.join(dst_dir, "labels.npy"), y)   # (N,)
@@ -139,12 +150,14 @@ def save_split(src_dir, dst_dir, img_size=(224,224)):
     with open(os.path.join(dst_dir, "class_names.txt"), "w", encoding="utf-8") as f:
         f.write("\n".join(names))
 
-    meta = {"img_size": list(img_size), "channels": 1, "value_range": "[0,1]", "roi_mask": True}
+    meta = {"img_size": list(img_size), "channels": 1, "value_range": "[0,1]", "roi_mask": True, "shuffled": shuffle, "seed": seed}
     with open(os.path.join(dst_dir, "meta.json"), "w", encoding="utf-8") as f:
         json.dump(meta, f, ensure_ascii=False, indent=2)
 
     print(f"저장 완료 → {dst_dir}")
     print(f"  images: {X.shape}, labels: {y.shape}, masks: {M.shape}, classes: {names}")
+    print(f"  라벨 분포 확인: {dict(zip(*np.unique(y, return_counts=True)))}")
+    print(f"  라벨 샘플 (첫 20개): {y[:20]}")
     return X, y, M, names
 
 # ---------------------------
