@@ -16,6 +16,8 @@ Adversarial_mdedical_AI/
 ├── models/
 │   ├── resnet50_binary_best.pth      # 최고 정확도 모델
 │   └── resnet50_binary_final.pth     # 최종 epoch 모델
+│   ├── training.log                   # 학습 로그 (Epoch별 Loss/Acc 기록)
+│   ├── training_curves.png            # 학습/검증 Loss & Accuracy 곡선 시각화
 └── confusion_matrix.png              # 테스트셋 성능 시각화
 
 '''
