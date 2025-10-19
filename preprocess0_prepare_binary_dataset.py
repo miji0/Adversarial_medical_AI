@@ -10,15 +10,16 @@ preprocess0_prepare_binary_dataset.py
 - KaggleHub로 원본 데이터셋(Brain Tumor MRI Dataset) 자동 다운로드
 - 이진 분류용 (tumor / notumor) 폴더 구조로 재분할: Notumor(notumor) vs Tumor(glioma, meningioma, pituitary)
 - Training과 Testing 데이터 모두 처리 (최초 1회만 실행)
-
+    
 ** 생성되는 폴더 구조 **
-processed_data/
-├─ Training/
-│   ├─ notumor/    # 정상 뇌 MRI 이미지
-│   └─ tumor/      # 종양 뇌 MRI 이미지 (glioma, meningioma, pituitary 통합)
-└─ Testing/
-    ├─ notumor/
-    └─ tumor/
+Adversarial_mdedical_AI/
+├─ processed_data/
+│   ├─ Training/
+│   │   ├─ notumor/     # 정상 뇌 MRI 이미지
+│   │   └─ tumor/   # 종양 뇌 MRI 이미지 (glioma, meningioma, pituitary 통합)
+│   └─ Testing/
+│       ├─ notumor/
+│       └─ tumor/
 
 ** 이미지 개수 정보 (Brain Tumor MRI Dataset) **
 - Training: notumor 1595개, tumor 4117개
@@ -29,6 +30,26 @@ import os
 import shutil
 from pathlib import Path
 import sys
+
+# =======================
+# Colab 환경 자동 감지 및 설정
+# =======================
+try:
+    import google.colab
+    IN_COLAB = True
+    print("[INFO] Google Colab 환경 감지")
+    
+    # Colab에서만 Drive 마운트
+    from google.colab import drive
+    drive.mount('/content/drive')
+    
+    # Colab에서만 경로 이동
+    os.chdir('/content/drive/MyDrive/Adversarial_medical_AI')
+    print(f"[INFO] 작업 디렉토리 변경: {os.getcwd()}")
+    
+except ImportError:
+    IN_COLAB = False
+    print("[INFO] 로컬 환경에서 실행")
 
 def download_kaggle_dataset():
     '''Kaggle에서 뇌종양 MRI 데이터셋을 자동으로 다운로드'''
@@ -199,8 +220,8 @@ def create_binary_classification_dataset(raw_data_root="raw_data", processed_dat
 if __name__ == "__main__":
     ## 선택1, 2 중 하나만 선택 후 나머지는 주석 처리 후 실행
 
-    #(선택1): Colab 실행 시 자동 다운로드 지원
-    # processed_root = Path("/content/drive/MyDrive/Adversarial_AI/processed_data")   ## 경로 수정 가능
+    # # (선택1): Colab 실행 시 자동 다운로드 지원
+    # processed_root = Path("/content/drive/MyDrive/Adversarial_medical_AI/processed_data")   ## 경로 수정 가능
     # processed_root.parent.mkdir(parents=True, exist_ok=True)
     # create_binary_classification_dataset(
     #     processed_data_root=processed_root,
@@ -211,6 +232,6 @@ if __name__ == "__main__":
     create_binary_classification_dataset(download_from_kaggle=True)
     
 # (선택) Colab 실행 후 아래 명령어로 정상 저장 여부 확인 가능
-# !ls -la "/content/drive/MyDrive/Adversarial_AI" || echo "Adversarial_AI 없음"
-# !ls -la "/content/drive/MyDrive/Adversarial_AI/processed_data" || echo "processed_data 없음"
-# !ls -la "/content/drive/MyDrive/Adversarial_AI/processed_data/Training" || echo "Training 없음"
+# !ls -la "/content/drive/MyDrive/Adversarial_medical_AI" || echo "Adversarial_medical_AI 없음"
+# !ls -la "/content/drive/MyDrive/Adversarial_medical_AI/processed_data" || echo "processed_data 없음"
+# !ls -la "/content/drive/MyDrive/Adversarial_medical_AI/processed_data/Training" || echo "Training 없음"

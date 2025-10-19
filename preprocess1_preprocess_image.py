@@ -13,14 +13,8 @@ preprocess1_preprocess_image.py
 - Training과 Testing 데이터 모두 처리
 
 ** 생성되는 폴더 구조 **
-Adversarial_AI/
+Adversarial_mdedical_AI/
 ├─ processed_data/                 # 입력 (preprocess0_prepare_binary_dataset.py 출력)
-│   ├─ Training/
-│   │   ├─ notumor/
-│   │   └─ tumor/
-│   └─ Testing/
-│       ├─ notumor/
-│       └─ tumor/
 ├─ processed_data_np224/           # 출력 (1채널, (N,224,224,1), [0,1], ROI 마스크 포함)
 │   ├─ Training/
 │   │   ├─ images.npy      # (N,224,224,1) float32, [0,1] (흑백)
@@ -49,6 +43,26 @@ import numpy as np
 from PIL import Image
 from tqdm import tqdm
 import json
+
+# =======================
+# Colab 환경 자동 감지 및 설정
+# =======================
+try:
+    import google.colab
+    IN_COLAB = True
+    print("[INFO] Google Colab 환경 감지")
+    
+    # Colab에서만 Drive 마운트
+    from google.colab import drive
+    drive.mount('/content/drive')
+    
+    # Colab에서만 경로 이동
+    os.chdir('/content/drive/MyDrive/Adversarial_medical_AI/Adversarial_medical_AI')
+    print(f"[INFO] 작업 디렉토리 변경: {os.getcwd()}")
+    
+except ImportError:
+    IN_COLAB = False
+    print("[INFO] 로컬 환경에서 실행")
 
 # ---------------------------
 # 1. 224x224 리사이즈 및 패딩 (흑백 1채널)
@@ -140,8 +154,8 @@ if __name__ == "__main__":
     ## 선택1, 2 중 하나만 선택 후 나머지는 주석 처리 후 실행
 
     # (선택1): Colab 실행 시 경로 지정 예시
-    # processed_root = "/content/drive/MyDrive/Adversarial_AI/processed_data"   ## 경로 수정 가능
-    # out_root = "/content/drive/MyDrive/Adversarial_AI/processed_data_np224"  ## 경로 수정 가능
+    # processed_root = "/content/drive/MyDrive/Adversarial_medical_AI/processed_data"   ## 경로 수정 가능
+    # out_root = "/content/drive/MyDrive/Adversarial_medical_AI/processed_data_np224"  ## 경로 수정 가능
     # SRC_TRAIN = os.path.join(processed_root, "Training")
     # SRC_TEST  = os.path.join(processed_root, "Testing")
     # TRAIN_DATA = os.path.join(out_root, "Training")
@@ -171,5 +185,5 @@ if __name__ == "__main__":
     
     
 # (선택) Colab 실행 후 아래 명령어로 정상 저장 여부 확인 가능
-# !ls -la "/content/drive/MyDrive/Adversarial_AI/processed_data_np224" || echo "processed_data_np224 없음"
-# !ls -la "/content/drive/MyDrive/Adversarial_AI/processed_data_np224/Training" || echo "Training 없음"
+# !ls -la "/content/drive/MyDrive/Adversarial_medical_AI/processed_data_np224" || echo "processed_data_np224 없음"
+# !ls -la "/content/drive/MyDrive/Adversarial_medical_AI/processed_data_np224/Training" || echo "Training 없음"
