@@ -27,4 +27,3 @@ __pycache__/
 Thumbs.db
 adversarial_zoo_attack.py
 requirements-lock.txt
-requirements.txt
